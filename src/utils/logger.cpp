@@ -10,6 +10,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <io.h>
+#pragma warning(disable:4996)
 #endif // #if USING( WINDOWS_PROGRAM )
 
 // foreground colors only
@@ -255,13 +256,12 @@ void Logger_Log( LogSeverity severity, const char* fmt, ... )
                     SetConsoleTextAttribute( hConsole, 7 ); // non-emphasized white
                 }
                 else
-            #else // #if USING( WINDOWS_PROGRAM )
+            #endif // #if USING( WINDOWS_PROGRAM )
                 {
                     fputs( colorEncoding, s_loggerLocations[i].GetOutputFile() );
                     vfprintf( s_loggerLocations[i].GetOutputFile(), fullFormat, args );
                     fputs( "\033[0m", s_loggerLocations[i].GetOutputFile() );
                 }
-            #endif // #else // #if USING( WINDOWS_PROGRAM )
         }
         else
         {
