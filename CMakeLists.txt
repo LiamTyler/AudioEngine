@@ -50,23 +50,41 @@ set(SRC
 # configure and build portaudio into the build/ext/portaudio directory
 # This happens now, at configuration time of this top level cmake file
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/ext/portaudio)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 execute_process(
     COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}/ext/portaudio
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ext/portaudio
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/ext/portaudio --config Release
+)
+execute_process(
+    COMMAND ${CMAKE_COMMAND} --build . --config Release
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ext/portaudio
+)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/ext/libsndfile)
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}/ext/libsndfile
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ext/libsndfile
+)
+execute_process(
+    COMMAND ${CMAKE_COMMAND} --build . --config Release
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ext/libsndfile
 )
 if(WIN32)
     execute_process(
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin
-    )
-    execute_process(
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/ext/portaudio/Release/portaudio_x64.dll ${CMAKE_BINARY_DIR}/bin
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/ext/libsndfile/Release/sndfile.dll ${CMAKE_BINARY_DIR}/bin
     )
 endif()
 
 add_executable(${PROJECT_NAME} ${SRC})
 SET_TARGET_POSTFIX( ${PROJECT_NAME})
-target_include_directories(${PROJECT_NAME} PRIVATE src)
-target_link_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/ext/portaudio ${CMAKE_BINARY_DIR}/ext/portaudio/Release)
-target_link_libraries(${PROJECT_NAME} PRIVATE portaudio_x64)
-target_include_directories(${PROJECT_NAME} PUBLIC ext/portaudio/include src/)
+target_link_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_BINARY_DIR}/ext/portaudio
+    ${CMAKE_BINARY_DIR}/ext/portaudio/Release
+    ${CMAKE_BINARY_DIR}/ext/libsndfile/Release
+)
+target_link_libraries(${PROJECT_NAME} PRIVATE portaudio_x64 sndfile)
+target_include_directories(${PROJECT_NAME} PUBLIC
+    ext/portaudio/include
+    ${CMAKE_BINARY_DIR}/ext/libsndfile/include
+    src/
+)
