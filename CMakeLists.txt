@@ -11,7 +11,7 @@ set(LINUX_PROGRAM   "NOT_IN_USE")
 set(WINDOWS_PROGRAM "NOT_IN_USE")
 
 if( NOT CMAKE_BUILD_TYPE )
-  set( CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE )
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -41,11 +41,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/platform_defines.hpp.in ${CMAKE
 
 set(SRC
     src/core_defines.hpp
+    src/audio_file.hpp
+	src/audio_system.cpp
+    src/audio_system.hpp
     src/platform_defines.hpp
     src/utils/logger.cpp
     src/utils/logger.hpp
     src/main.cpp
 )
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRC})
 
 # configure and build portaudio into the build/ext/portaudio directory
 # This happens now, at configuration time of this top level cmake file
