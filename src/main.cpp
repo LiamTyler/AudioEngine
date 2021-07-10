@@ -2,11 +2,6 @@
 #include "utils/logger.hpp"
 #include "portaudio.h"
 
-struct AudioInstance
-{
-    AudioFile* audioFile = nullptr;
-    size_t currentFrame = 0;
-};
 
 static int patestCallback( const void *inputBuffer, void *outputBuffer,
                            unsigned long framesPerBuffer,
@@ -17,7 +12,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     (void)inputBuffer;
     float *out = (float*)outputBuffer;
     AudioInstance* audioIn = (AudioInstance*)userData;
-    size_t& currentFrame = audioIn->currentFrame;
+    uint32_t& currentFrame = audioIn->currentFrame;
     AudioFile* aFile = audioIn->audioFile;
 
     uint32_t outIdx = 0;
@@ -29,6 +24,8 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
             {
                 out[outIdx++] = aFile->data[aFile->numChannels * currentFrame + channel];
             }
+            //out[outIdx++] = aFile->data[currentFrame];
+            //out[outIdx++] = aFile->data[currentFrame];
             ++currentFrame;
         }
         else
@@ -50,8 +47,9 @@ int main( int argc, char** argv )
 
     AudioSystem::Initialize();
 
-    AudioFile* audioFile = AudioSystem::LoadAudioFile( "organfinale.wav" );
-    AudioInstance instance = { audioFile, 0 };
+    AudioFile* audioFile = AudioSystem::LoadAudioFile( "sm64_mario_hoo.wav" );
+    AudioInstance instance;
+    instance.audioFile = audioFile;
    
     PaStreamParameters outputParameters;
     PaStream *stream;
@@ -65,8 +63,8 @@ int main( int argc, char** argv )
     }
     LOG( "default low output latency: %f", Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency );
 
-    outputParameters.channelCount = audioFile->numChannels;       /* stereo output */
-    outputParameters.sampleFormat = paFloat32; /* 32 bit floating point output */
+    outputParameters.channelCount = audioFile->numChannels;
+    outputParameters.sampleFormat = paFloat32;
     outputParameters.suggestedLatency = 0.050; // Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
 

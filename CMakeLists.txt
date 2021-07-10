@@ -41,7 +41,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/platform_defines.hpp.in ${CMAKE
 
 set(SRC
     src/core_defines.hpp
-    src/audio_file.hpp
+	src/audio_resample.cpp
+    src/audio_resample.hpp
 	src/audio_system.cpp
     src/audio_system.hpp
     src/platform_defines.hpp
